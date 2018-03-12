@@ -10,11 +10,15 @@ let soundTrack,
     backgroundSpeed,
     player,
     cursors,
+    bullet,
     bullets, //group
     bulletTime = 0,
     fireButton,
     enemies,
-    enemy;
+    enemy,
+    score = 0,
+    scoreText,
+    winText;
 
 
 
@@ -54,13 +58,18 @@ const mainState = {
         cursors = game.input.keyboard.createCursorKeys();
 
         //the bullets of our spaceShip
-        bullets = game.add.weapon(30, 'bullet'); //group, when something needs to be recycled(remember: memory garbage collection)
-        bullets.bulletAngleOffset = 90;
-        bullets.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
-        bullets.bulletSpeed = 400;
-        bullets.trackSprite(player, 35, 0);
-        bullets.physicsBodyType = Phaser.Physics.ARCADE;
+        bullets = game.add.group();
         bullets.enableBody = true;
+        bullets.physicsBodyType = Phaser.Physics.ARCADE;
+
+        for (let i = 0; i < 20; i++) {
+            let b = bullets.create(0, 0, 'bullet');
+            b.name = 'bullet' + i;
+            b.exists = false;
+            b.visible = false;
+            b.checkWorldBounds = true;
+            b.events.onOutOfBounds.add(resetBullet, this);
+        }
 
         fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
@@ -73,10 +82,10 @@ const mainState = {
 
     update() {
 
-        game.physics.arcade.overlap(bullets, enemies, collisionHandler, null, this);
 
+        game.physics.arcade.overlap(bullets, enemies, collisionHandler, null, this);
         //playing soundtrack, loop = true
-        //soundTrack.play("", 0, 7, true, false);
+        soundTrack.play("", 0, 5, true, false);
 
         //makes cenario moves in vertical loop
         spaceField.tilePosition.y += backgroundSpeed;
@@ -93,31 +102,55 @@ const mainState = {
 
         //fire
         if (fireButton.isDown) {
-            bullets.fire();
+            fireBullet();
         }
 
     }
 }
 
+function fireBullet(){
+    if (game.time.now > bulletTime)
+    {
+        bullet = bullets.getFirstExists(false);
+
+        if (bullet)
+        {
+            bullet.reset(player.x + 27, player.y - 8);
+            bullet.body.velocity.y = -400;
+            bulletTime = game.time.now + 150;
+        }
+    }
+}
+
+//called if bullet goes out of the screen
+function resetBullet(bullet){
+    bullet.kill();
+}
+
+function collisionHandler(bullet, enemy){
+    bullet.kill();
+    enemy.kill();
+}
+
 function createEnemies() {
     for (let y = 0; y < 4; ++y) {
         for (let x = 0; x < 10; ++x) {
-            enemy = enemies.create(x * 200, y * 200, 'enemy');
+            enemy = enemies.create(x * 70, y * 50, 'enemy');
             enemy.anchor.setTo(0.5, 0.5);
         }
     }
-    enemies.scale.x = 0.15;
-    enemies.scale.y = 0.15;
+    enemies.scale.x = 0.8;
+    enemies.scale.y = 0.8;
 
     enemies.x = 100;
     enemies.y = 50;
 
     let tween = game.add.tween(enemies).to(
-        { x: 450 },
+        { x: 200 },
         2000,
         Phaser.Easing.Linear.None,
         true,
-        0, 
+        0,
         1000,
         true
     );
@@ -125,13 +158,8 @@ function createEnemies() {
     tween.onRepeat.add(descend, this);
 }
 
-function descend(){
+function descend() {
     enemies.y += 10;
-}
-
-function collisionHandler(){
-    bullets.kill();
-    enemy.kill();
 }
 
 game.state.add('mainState', mainState);
