@@ -78,6 +78,10 @@ const mainState = {
         enemies.physicsBodyType = Phaser.Physics.ARCADE;
 
         createEnemies();
+
+        scoreText =  game.add.text(0, 550, 'Score:', {font: '32px Arial', fill: '#fff'});
+        winText = game.add.text(game.world.centerX, game.world.centerY, 'You Win!', {font: '32px Arial', fill: '#fff'});
+        winText.visible = false;
     },
 
     update() {
@@ -105,6 +109,13 @@ const mainState = {
             fireBullet();
         }
 
+        scoreText.text = 'Score: ' + score;
+
+        if(score == 4000){
+            wintext.visible = true;
+            scoreText.visible = false;
+        }
+
     }
 }
 
@@ -130,6 +141,8 @@ function resetBullet(bullet){
 function collisionHandler(bullet, enemy){
     bullet.kill();
     enemy.kill();
+
+    score += 100;
 }
 
 function createEnemies() {
