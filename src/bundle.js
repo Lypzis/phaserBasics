@@ -1,3 +1,43 @@
+(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+/* eslint-disable */
+class Cenario {
+
+    constructor(soundTrack, spaceField, backgroundSpeed){
+        this.soundTrack = soundTrack;
+        this.spaceField = spaceField;
+        this.backgroundSpeed = backgroundSpeed;
+    }
+
+    moveBackground(){
+        this.spaceField.tilePosition.y += this.backgroundSpeed;
+    }
+
+    musicBackground(){
+        this.soundTrack.play("", 0, 5, true, false);
+    }
+
+}
+
+module.exports = Cenario;
+},{}],2:[function(require,module,exports){
+/* eslint-disable */
+class Preload {
+
+    preloadImages(game){
+        game.load.image('nightField', './assets/nightSky.png');
+        game.load.image('player', './assets/spaceShip.png');
+        game.load.image('bullet', './assets/bullet.png'); //16x16
+        game.load.image('enemy', './assets/enemy.png');
+
+    }
+
+    preloadAudio(game){
+        game.load.audio('soundTrack', './audio/mars.mp3');
+    }
+};
+
+module.exports = Preload;
+},{}],3:[function(require,module,exports){
 /* eslint-disable */
 
 const Preload = require('./Preload.js');
@@ -172,3 +212,4 @@ function descend() {
 game.state.add('mainState', mainState);
 
 game.state.start('mainState');
+},{"./Cenario.js":1,"./Preload.js":2}]},{},[3]);
